@@ -1,0 +1,1549 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+    <title>Aile Albümü</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Reenie+Beanie&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── RESET ── */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a22;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #e8e4dc;
+        --muted: rgba(232, 228, 220, 0.45);
+        --accent: #c8a96e;
+        --accent2: #e8c87a;
+        --paper: #f5edda;
+        --paper2: #ede3c8;
+        --paper3: #e4d6b4;
+        --ink: #1a1208;
+        --sepia: #6b4c22;
+        --spine: rgba(0, 0, 0, 0.22);
+        --crimson: #7a2020;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        background: var(--bg);
+        font-family: "Inter", system-ui, sans-serif;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* ── PORTRAIT ── */
+      #pw {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #0f0f13;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 9999;
+        gap: 16px;
+        padding: 32px;
+      }
+      #pw h2 {
+        font-size: clamp(18px, 5vw, 28px);
+        font-weight: 600;
+        color: var(--text);
+      }
+      #pw p {
+        font-size: clamp(13px, 3vw, 16px);
+        color: var(--muted);
+      }
+      .ri {
+        font-size: 52px;
+        animation: rh 2s ease-in-out infinite;
+      }
+      @keyframes rh {
+        0%,
+        100% {
+          transform: rotate(0);
+        }
+        50% {
+          transform: rotate(90deg);
+        }
+      }
+      @media (orientation: portrait) {
+        #pw {
+          display: flex;
+        }
+        #app {
+          display: none;
+        }
+      }
+
+      /* ── APP ── */
+      #app {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        gap: 8px;
+      }
+
+      /* ── TOOLBAR ── */
+      .toolbar {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 5px 8px;
+        backdrop-filter: blur(12px);
+        z-index: 100;
+        flex-shrink: 0;
+      }
+      .tb-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid transparent;
+        border-radius: 7px;
+        padding: 5px 12px;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .tb-btn svg {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+      }
+      .tb-btn:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: var(--border);
+      }
+      .tb-btn.active {
+        color: var(--accent2);
+        background: rgba(200, 169, 110, 0.12);
+        border-color: rgba(200, 169, 110, 0.3);
+      }
+      .tb-sep {
+        width: 1px;
+        height: 20px;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+      label.tb-btn {
+        cursor: pointer;
+      }
+
+      /* ── BOOK WRAPPER ── */
+      .book-wrap {
+        position: relative;
+        width: min(93vw, 1020px);
+        height: min(74vh, 570px);
+        flex-shrink: 0;
+      }
+
+      /* ── BOOK SHELL ── */
+      .book-shell {
+        position: absolute;
+        inset: 0;
+        border-radius: 6px 12px 12px 6px;
+        background: linear-gradient(
+          160deg,
+          #28160a 0%,
+          #1a0e06 50%,
+          #28160a 100%
+        );
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.85),
+          0 6px 20px rgba(0, 0, 0, 0.6),
+          inset 0 1px 0 rgba(200, 169, 110, 0.1);
+      }
+      /* Gold thin border inset */
+      .book-shell::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border-radius: 4px 10px 10px 4px;
+        border: 1px solid rgba(200, 169, 110, 0.18);
+        pointer-events: none;
+      }
+      /* Spine shadow */
+      .book-shell::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(50% - 16px);
+        width: 32px;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.55) 0%,
+          rgba(0, 0, 0, 0.15) 40%,
+          rgba(0, 0, 0, 0.15) 60%,
+          rgba(0, 0, 0, 0.55) 100%
+        );
+        pointer-events: none;
+      }
+
+      /* ── PAGES ── */
+      .pages {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        border-radius: 5px 11px 11px 5px;
+        overflow: hidden;
+        z-index: 2;
+      }
+
+      .page {
+        width: 50%;
+        height: 100%;
+        padding: 16px 15px 30px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Paper texture via CSS noise */
+      .lp {
+        background:
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E"),
+          linear-gradient(
+            108deg,
+            #faf3e2 0%,
+            var(--paper) 30%,
+            var(--paper2) 75%,
+            var(--paper3) 100%
+          );
+        box-shadow:
+          inset -12px 0 28px rgba(30, 14, 4, 0.15),
+          inset 4px 0 10px rgba(30, 14, 4, 0.06);
+      }
+      .rp {
+        background:
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E"),
+          linear-gradient(
+            72deg,
+            var(--paper3) 0%,
+            var(--paper2) 25%,
+            var(--paper) 70%,
+            #faf3e2 100%
+          );
+        box-shadow:
+          inset 12px 0 28px rgba(30, 14, 4, 0.15),
+          inset -4px 0 10px rgba(30, 14, 4, 0.06);
+      }
+      /* Spine gutter line */
+      .lp::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 1px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(80, 40, 10, 0.28) 15%,
+          rgba(80, 40, 10, 0.28) 85%,
+          transparent
+        );
+        pointer-events: none;
+      }
+
+      /* Thin inner frame */
+      .page-frame {
+        position: absolute;
+        inset: 8px;
+        pointer-events: none;
+        z-index: 0;
+        border: 1px solid rgba(130, 85, 30, 0.14);
+        border-radius: 1px;
+      }
+      .page-frame::before,
+      .page-frame::after {
+        content: "·";
+        position: absolute;
+        color: rgba(130, 85, 30, 0.22);
+        font-size: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .page-frame::before {
+        top: -5px;
+      }
+      .page-frame::after {
+        bottom: -5px;
+      }
+
+      /* Spine shadow overlay */
+      .spine-ov {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        z-index: 12;
+        pointer-events: none;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.25) 0%,
+          rgba(0, 0, 0, 0.06) 38%,
+          rgba(0, 0, 0, 0.06) 62%,
+          rgba(0, 0, 0, 0.25) 100%
+        );
+      }
+
+      /* ── BOOKMARKS ──
+   Horizontal tabs stacked on RIGHT edge, inside book bounds.
+   Each tab is a slim horizontal pill. Container uses flex-col
+   and max-height + overflow so they never exceed book height.
+── */
+      .bookmarks {
+        position: absolute;
+        /* flush with right edge, inside book */
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 28px;
+        z-index: 30;
+        display: flex;
+        flex-direction: column;
+        /* distribute tabs evenly over full height */
+        justify-content: space-around;
+        pointer-events: none;
+      }
+
+      .bookmark {
+        position: relative;
+        /* slim horizontal chip — writing is horizontal */
+        height: 0; /* flex will stretch via flex:1 */
+        flex: 1;
+        max-height: 42px;
+        min-height: 18px;
+        width: 100%;
+        writing-mode: horizontal-tb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        pointer-events: auto;
+        background: var(--bm-c, #7a2020);
+        /* notch cut on left side */
+        clip-path: polygon(6px 0%, 100% 0%, 100% 100%, 6px 100%, 0% 50%);
+        transition:
+          filter 0.18s,
+          transform 0.18s;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.5);
+      }
+      .bookmark::before {
+        /* shine line top */
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 8px;
+        right: 2px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .bookmark span {
+        font-family: "Inter", sans-serif;
+        font-size: clamp(6px, 0.85vw, 9px);
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.88);
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: rotate(180deg);
+        line-height: 1;
+        max-height: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .bookmark:hover {
+        filter: brightness(1.18);
+      }
+      .bookmark.active {
+        filter: brightness(1.22);
+        clip-path: polygon(4px 0%, 100% 0%, 100% 100%, 4px 100%, 0% 50%);
+        box-shadow: 3px 0 12px rgba(0, 0, 0, 0.6);
+        z-index: 2;
+      }
+      /* Active indicator — left accent line */
+      .bookmark.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 15%;
+        bottom: 15%;
+        width: 2px;
+        background: var(--accent2);
+        border-radius: 0 1px 1px 0;
+      }
+
+      /* ── NAV BUTTONS ── */
+      .nav-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 100;
+        flex-shrink: 0;
+      }
+      .nav-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 5px 14px;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .nav-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+      .nav-btn:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.09);
+        border-color: rgba(255, 255, 255, 0.15);
+      }
+      .nav-btn:disabled,
+      .nav-btn.hidden {
+        opacity: 0.25;
+        pointer-events: none;
+      }
+      .page-counter {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 400;
+        min-width: 64px;
+        text-align: center;
+        letter-spacing: 0.5px;
+      }
+
+      /* ── PAGE CONTENT ── */
+      .view-section {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+      }
+      .view-section.hidden {
+        display: none;
+      }
+      .sub-page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* page-switch crossfade */
+      .page-fade-out {
+        animation: pfOut 0.12s ease forwards;
+      }
+      .page-fade-in {
+        animation: pfIn 0.12s ease forwards;
+      }
+      @keyframes pfOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+      @keyframes pfIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .page-title {
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: clamp(10px, 1.5vw, 14px);
+        color: var(--sepia);
+        letter-spacing: 0.3px;
+        text-align: center;
+        padding-bottom: 6px;
+        margin-bottom: 7px;
+        border-bottom: 1px solid rgba(107, 76, 34, 0.2);
+        flex-shrink: 0;
+      }
+      .wedding-title {
+        color: var(--crimson);
+      }
+      .baby-title {
+        color: #5c3870;
+      }
+
+      /* grids */
+      .photo-grid {
+        display: grid;
+        gap: 8px;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        padding: 4px;
+      }
+      .collage-1 {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+      }
+      .collage-2 {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+      }
+      .collage-3 {
+        grid-template-columns: 1.5fr 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      .collage-3 .flip-card:first-child {
+        grid-row: span 2;
+      }
+      .collage-4 {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+
+      /* ── PHOTO CARDS ── */
+      .flip-card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        perspective: 900px;
+        cursor: pointer;
+        transform: rotate(var(--rot, 0deg));
+        transition: transform 0.22s;
+        z-index: 1;
+      }
+      .flip-card:hover {
+        transform: rotate(0deg) scale(1.03) !important;
+        z-index: 10;
+      }
+      .flip-card-inner {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-style: preserve-3d;
+        box-shadow:
+          0 3px 12px rgba(15, 8, 2, 0.35),
+          0 1px 3px rgba(0, 0, 0, 0.18);
+      }
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        background: #f5edda;
+        padding: 5px 5px 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .flip-card-front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: sepia(0.2) contrast(1.05) brightness(0.98);
+        border: 1px solid rgba(180, 140, 80, 0.4);
+        background: linear-gradient(
+          90deg,
+          #e8d8b0 25%,
+          #f5edda 50%,
+          #e8d8b0 75%
+        );
+        background-size: 300% 100%;
+        animation: shim 1.2s ease infinite;
+      }
+      .flip-card-front img.loaded {
+        animation: none;
+        background: none;
+      }
+      @keyframes shim {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
+
+      /* Tape strip */
+      .flip-card-front::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 38px;
+        height: 12px;
+        background: rgba(200, 170, 80, 0.38);
+        border-left: 1px dotted rgba(130, 100, 30, 0.18);
+        border-right: 1px dotted rgba(130, 100, 30, 0.18);
+        z-index: 5;
+      }
+
+      .flip-card-back {
+        transform: rotateY(180deg);
+        justify-content: center;
+        align-items: center;
+        padding: 12px;
+        background: #f5edda;
+        background-image: repeating-linear-gradient(
+          transparent,
+          transparent 22px,
+          rgba(160, 120, 50, 0.18) 22px,
+          rgba(160, 120, 50, 0.18) 23px
+        );
+      }
+      .flip-card-back .date {
+        font-size: clamp(8px, 1.1vw, 11px);
+        color: var(--crimson);
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+        opacity: 0.8;
+        font-family: "Inter", sans-serif;
+      }
+      .flip-card-back .note {
+        font-family: "Reenie Beanie", cursive;
+        font-size: clamp(13px, 1.8vw, 19px);
+        line-height: 1.5;
+        color: var(--ink);
+        text-align: center;
+        max-height: 65%;
+        overflow-y: auto;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      .wedding-style .flip-card-front {
+        border: 1px solid rgba(180, 140, 60, 0.55);
+      }
+      .baby-style .flip-card-front {
+        border-radius: 8px;
+        border: 1px dashed rgba(130, 80, 180, 0.35);
+      }
+      .baby-style .flip-card-front img {
+        border-radius: 5px;
+      }
+
+      /* Replace btn */
+      .rep-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(245, 237, 218, 0.9);
+        border: 1px solid rgba(107, 76, 34, 0.4);
+        border-radius: 4px;
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 20;
+        transition: background 0.15s;
+      }
+      .rep-btn:hover {
+        background: #f0c84a;
+      }
+      .flip-card-front:hover .rep-btn {
+        display: flex;
+      }
+
+      /* Contenteditable */
+      [contenteditable="true"] {
+        outline: none;
+        border: 1px dashed transparent;
+        padding: 2px 4px;
+        border-radius: 2px;
+        transition: border-color 0.15s;
+        cursor: text;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+      [contenteditable="true"]:hover,
+      [contenteditable="true"]:focus {
+        border-color: rgba(130, 85, 30, 0.35);
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      /* Baby stats */
+      .baby-stats-large {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        margin: 5px 0 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(130, 80, 180, 0.15);
+        flex-shrink: 0;
+      }
+      .scale-graphic.large {
+        text-align: center;
+        color: var(--ink);
+      }
+      .scale-graphic.large .scale-screen {
+        width: 70px;
+        height: 36px;
+        background: #d8ede6;
+        border: 1px solid rgba(100, 130, 100, 0.35);
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+        color: var(--ink);
+        box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+      }
+      .scale-graphic.large .weight-value {
+        font-size: clamp(12px, 1.7vw, 18px);
+        outline: none;
+        min-width: 24px;
+      }
+      .scale-graphic.large .unit {
+        font-size: 8px;
+        margin-left: 2px;
+        opacity: 0.65;
+      }
+      .scale-graphic.large .stat-label {
+        font-size: clamp(8px, 1.1vw, 11px);
+        margin-top: 3px;
+        display: block;
+        font-style: italic;
+      }
+      .tape-measure-graphic.large {
+        text-align: center;
+        color: var(--ink);
+      }
+      .tape-measure-graphic.large .tape-ribbon {
+        width: 28px;
+        height: 44px;
+        margin: 0 auto;
+        background: linear-gradient(to right, #e8cc50, #f5df80, #e8cc50);
+        border: 1px solid rgba(180, 140, 40, 0.4);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .tape-measure-graphic.large .height-value {
+        font-weight: bold;
+        color: var(--ink);
+        font-size: clamp(11px, 1.5vw, 16px);
+        outline: none;
+        min-width: 18px;
+      }
+      .tape-measure-graphic.large .stat-label {
+        font-size: clamp(8px, 1.1vw, 11px);
+        margin-top: 3px;
+        display: block;
+        font-style: italic;
+      }
+
+      /* Baby journal */
+      .baby-journal {
+        flex: 1;
+        background: #f5edda;
+        background-image: repeating-linear-gradient(
+          transparent,
+          transparent 24px,
+          rgba(150, 105, 35, 0.16) 24px,
+          rgba(150, 105, 35, 0.16) 25px
+        );
+        background-attachment: local;
+        border-radius: 2px;
+        padding: 8px 12px;
+        box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(130, 85, 30, 0.2);
+      }
+      .baby-journal .journal-title {
+        color: #5c3870;
+        font-style: italic;
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: clamp(10px, 1.4vw, 14px);
+        background: #f5edda;
+        padding: 0 6px;
+        align-self: flex-start;
+        border-radius: 2px;
+      }
+      .baby-journal .journal-text {
+        flex: 1;
+        outline: none;
+        font-family: "Reenie Beanie", cursive;
+        font-size: clamp(15px, 2vw, 22px);
+        line-height: 25px;
+        overflow-y: auto;
+        color: var(--ink);
+      }
+
+      /* Doodle */
+      .write-mode .page {
+        cursor: crosshair;
+      }
+      .erase-mode .page {
+        cursor: not-allowed;
+      }
+      .doodle-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .doodle {
+        position: absolute;
+        color: var(--ink);
+        opacity: 0.78;
+        font-family: "Reenie Beanie", cursive;
+        font-size: clamp(16px, 2vw, 24px);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
+        white-space: nowrap;
+        pointer-events: auto;
+        cursor: default;
+      }
+      .erase-mode .doodle:hover {
+        color: var(--crimson) !important;
+        text-decoration: line-through;
+        cursor: pointer;
+      }
+      .doodle-input {
+        position: absolute;
+        background: rgba(245, 237, 218, 0.94);
+        border: 1px dashed rgba(107, 76, 34, 0.5);
+        color: var(--ink);
+        font-family: "Reenie Beanie", cursive;
+        font-size: clamp(16px, 2vw, 24px);
+        padding: 2px 6px;
+        outline: none;
+        z-index: 50;
+        min-width: 100px;
+        border-radius: 2px;
+      }
+
+      /* Page number */
+      .pnum {
+        position: absolute;
+        bottom: 7px;
+        font-family: "Inter", sans-serif;
+        font-size: clamp(8px, 0.9vw, 11px);
+        color: rgba(107, 76, 34, 0.4);
+        letter-spacing: 0.5px;
+      }
+      .lp .pnum {
+        left: 16px;
+      }
+      .rp .pnum {
+        right: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Portrait warning -->
+    <div id="pw">
+      <div class="ri">📱</div>
+      <h2>Lütfen Cihazınızı Yan Çevirin</h2>
+      <p>En iyi deneyim için yatay mod gerekiyor.</p>
+    </div>
+
+    <div id="app">
+      <!-- ── TOOLBAR ── -->
+      <div class="toolbar">
+        <button id="write-btn" class="tb-btn">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M11 2l3 3-8 8H3v-3L11 2z" />
+          </svg>
+          Yazı Ekle
+        </button>
+        <div class="tb-sep"></div>
+        <button id="erase-btn" class="tb-btn">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M13 13H7l-4-4 6-6 4 4-2 2" />
+          </svg>
+          Silgi
+        </button>
+        <div class="tb-sep"></div>
+        <label for="bulk-up" class="tb-btn">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <rect x="2" y="4" width="12" height="9" rx="1" />
+            <circle cx="8" cy="8.5" r="2" />
+            <path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" />
+          </svg>
+          Fotoğraf Yükle
+        </label>
+        <input
+          type="file"
+          id="bulk-up"
+          multiple
+          accept="image/*"
+          style="display: none"
+        />
+        <input
+          type="file"
+          id="single-up"
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
+
+      <!-- ── BOOK ── -->
+      <div class="book-wrap">
+        <div class="book-shell"></div>
+
+        <div class="pages">
+          <!-- LEFT PAGE -->
+          <div class="page lp" id="lp-el">
+            <div class="page-frame"></div>
+
+            <div id="wedding-left" class="view-section">
+              <div class="sub-page" data-page="1">
+                <div class="photo-grid collage-1">
+                  <div class="flip-card wedding-style">
+                    <div class="flip-card-inner">
+                      <div class="flip-card-front">
+                        <img
+                          src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80"
+                          loading="eager"
+                          decoding="async"
+                        />
+                        <button class="rep-btn">📷</button>
+                      </div>
+                      <div class="flip-card-back">
+                        <span
+                          class="date"
+                          contenteditable="true"
+                          spellcheck="false"
+                          >Mutlu Günümüz</span
+                        >
+                        <p
+                          class="note"
+                          contenteditable="true"
+                          spellcheck="false"
+                        >
+                          Evet dediğimiz o an… ✨
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="baby-left" class="view-section hidden"></div>
+            <span class="pnum" id="lpnum">1</span>
+          </div>
+
+          <!-- RIGHT PAGE -->
+          <div class="page rp" id="rp-el">
+            <div class="page-frame"></div>
+
+            <div id="wedding-right" class="view-section">
+              <div class="sub-page" data-page="1">
+                <h3 class="page-title wedding-title">En Mutlu Günümüz</h3>
+                <div class="photo-grid collage-2">
+                  <div class="flip-card wedding-style">
+                    <div class="flip-card-inner">
+                      <div class="flip-card-front">
+                        <img
+                          src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80"
+                          loading="eager"
+                          decoding="async"
+                        />
+                        <button class="rep-btn">📷</button>
+                      </div>
+                      <div class="flip-card-back">
+                        <p
+                          class="note"
+                          contenteditable="true"
+                          spellcheck="false"
+                        >
+                          İlk dansımız…
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flip-card wedding-style">
+                    <div class="flip-card-inner">
+                      <div class="flip-card-front">
+                        <img
+                          src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=400&q=80"
+                          loading="eager"
+                          decoding="async"
+                        />
+                        <button class="rep-btn">📷</button>
+                      </div>
+                      <div class="flip-card-back">
+                        <p
+                          class="note"
+                          contenteditable="true"
+                          spellcheck="false"
+                        >
+                          Pastamızı keserken.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="baby-right" class="view-section hidden"></div>
+            <span class="pnum" id="rpnum">2</span>
+
+            <!-- Bookmarks — inside right page, flush to edge -->
+            <div class="bookmarks" id="bm-container">
+              <div
+                class="bookmark active"
+                style="--bm-c: #8b2020"
+                data-type="wedding"
+              >
+                <span>Düğün</span>
+              </div>
+              <div class="bookmark" style="--bm-c: #3d2070" data-type="baby">
+                <span>Bebek</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="spine-ov"></div>
+        </div>
+        <!-- /pages -->
+      </div>
+      <!-- /book-wrap -->
+
+      <!-- ── NAV ROW ── -->
+      <div class="nav-row">
+        <button id="prev-btn" class="nav-btn hidden">
+          <svg
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M8 2L4 6l4 4" />
+          </svg>
+          Önceki
+        </button>
+        <span class="page-counter" id="pg-counter">1 / 1</span>
+        <button id="next-btn" class="nav-btn hidden">
+          Sonraki
+          <svg
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path d="M4 2l4 4-4 4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- /app -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ─── BABY PAGES ─── */
+        function genBaby() {
+          const bl = document.getElementById("baby-left"),
+            br = document.getElementById("baby-right");
+          if (!bl || !br) return;
+          bl.innerHTML = "";
+          br.innerHTML = "";
+          for (let i = 1; i <= 12; i++) {
+            const t = i === 12 ? "1 Yaşında 🎂" : `${i}. Ay`;
+            const ls = document.createElement("div");
+            ls.className = "sub-page";
+            ls.setAttribute("data-page", i);
+            if (i !== 1) ls.style.display = "none";
+            ls.innerHTML = `<div class="photo-grid collage-4">${[0, 1, 2, 3]
+              .map(
+                () => `
+      <div class="flip-card baby-style"><div class="flip-card-inner">
+        <div class="flip-card-front">
+          <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&q=80" loading="lazy" decoding="async">
+          <button class="rep-btn">📷</button>
+        </div>
+        <div class="flip-card-back">
+          <span class="date" contenteditable="true" spellcheck="false">${i === 12 ? "1 Yaş" : i + ". Ay"}</span>
+          <p class="note" contenteditable="true" spellcheck="false">Harika bir anı…</p>
+        </div>
+      </div></div>`,
+              )
+              .join("")}</div>`;
+            bl.appendChild(ls);
+            const rs = document.createElement("div");
+            rs.className = "sub-page";
+            rs.setAttribute("data-page", i);
+            if (i !== 1) rs.style.display = "none";
+            rs.innerHTML = `<h3 class="page-title baby-title">${t}</h3>
+      <div class="baby-stats-large">
+        <div class="scale-graphic large"><div class="scale-screen"><span class="weight-value" contenteditable="true" spellcheck="false">0.0</span><span class="unit">kg</span></div><span class="stat-label">Kilo</span></div>
+        <div class="tape-measure-graphic large"><div class="tape-ribbon"><span class="height-value" contenteditable="true" spellcheck="false">0</span></div><span class="stat-label">Boy (cm)</span></div>
+      </div>
+      <div class="baby-journal"><h4 class="journal-title">Bu Ay Neler Oldu?</h4>
+        <div class="journal-text" contenteditable="true" spellcheck="false">Bebeğinizin ${i === 12 ? "1 yaşındaki" : i + ". ayındaki"} gelişimini buraya yazabilirsiniz…</div>
+      </div>`;
+            br.appendChild(rs);
+          }
+        }
+        genBaby();
+
+        /* ─── STATE ─── */
+        let AT = "wedding",
+          CP = 1,
+          TP = 1;
+        const prevBtn = document.getElementById("prev-btn"),
+          nextBtn = document.getElementById("next-btn"),
+          pgCtr = document.getElementById("pg-counter");
+
+        function updateNums() {
+          document.getElementById("lpnum").textContent = CP * 2 - 1;
+          document.getElementById("rpnum").textContent = CP * 2;
+          pgCtr.textContent = `${CP} / ${TP}`;
+        }
+
+        /* Instant page switch — no animation */
+        function switchPage(newPage) {
+          const ls = document.getElementById(AT + "-left"),
+            rs = document.getElementById(AT + "-right");
+          if (!ls || !rs) return;
+          // hide current
+          const curL = ls.querySelector(`.sub-page[data-page="${CP}"]`),
+            curR = rs.querySelector(`.sub-page[data-page="${CP}"]`);
+          if (curL) curL.style.display = "none";
+          if (curR) curR.style.display = "none";
+          CP = newPage;
+          // show new
+          const nL = ls.querySelector(`.sub-page[data-page="${CP}"]`),
+            nR = rs.querySelector(`.sub-page[data-page="${CP}"]`);
+          if (nL) nL.style.display = "flex";
+          if (nR) nR.style.display = "flex";
+          prevBtn.classList.toggle("hidden", CP === 1 || TP <= 1);
+          nextBtn.classList.toggle("hidden", CP === TP || TP <= 1);
+          updateNums();
+        }
+
+        function updatePagination() {
+          const ls = document.getElementById(AT + "-left"),
+            rs = document.getElementById(AT + "-right");
+          if (!ls || !rs) return;
+          ls.querySelectorAll(".sub-page").forEach(
+            (p) => (p.style.display = "none"),
+          );
+          rs.querySelectorAll(".sub-page").forEach(
+            (p) => (p.style.display = "none"),
+          );
+          TP =
+            Math.max(
+              ls.querySelectorAll(".sub-page").length,
+              rs.querySelectorAll(".sub-page").length,
+            ) || 1;
+          const nL = ls.querySelector(`.sub-page[data-page="${CP}"]`),
+            nR = rs.querySelector(`.sub-page[data-page="${CP}"]`);
+          if (nL) nL.style.display = "flex";
+          if (nR) nR.style.display = "flex";
+          prevBtn.classList.toggle("hidden", CP === 1 || TP <= 1);
+          nextBtn.classList.toggle("hidden", CP === TP || TP <= 1);
+          updateNums();
+        }
+
+        nextBtn.addEventListener("click", () => {
+          if (CP < TP) switchPage(CP + 1);
+        });
+        prevBtn.addEventListener("click", () => {
+          if (CP > 1) switchPage(CP - 1);
+        });
+
+        /* ─── BOOKMARKS ─── */
+        function hideAll() {
+          document
+            .querySelectorAll(".view-section")
+            .forEach((s) => (s.style.display = "none"));
+        }
+
+        function setupBM() {
+          document.querySelectorAll(".bookmark").forEach((bm) => {
+            bm.onclick = () => {
+              AT = bm.dataset.type;
+              document
+                .querySelectorAll(".bookmark")
+                .forEach((b) => b.classList.remove("active"));
+              bm.classList.add("active");
+              hideAll();
+              const l = document.getElementById(AT + "-left"),
+                r = document.getElementById(AT + "-right");
+              if (l) l.style.display = "flex";
+              if (r) r.style.display = "flex";
+              CP = 1;
+              updatePagination();
+            };
+          });
+        }
+        setupBM();
+
+        /* ─── CARDS ─── */
+        function setupCards(cards) {
+          cards.forEach((c) => {
+            if (c.dataset.init) return;
+            c.dataset.init = "1";
+            c.addEventListener("click", (e) => {
+              if (
+                e.target.isContentEditable ||
+                e.target.classList.contains("rep-btn")
+              )
+                return;
+              c.classList.toggle("flipped");
+            });
+            c.querySelectorAll("[contenteditable]").forEach((el) =>
+              el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  el.blur();
+                }
+              }),
+            );
+            c.querySelectorAll("img").forEach((img) => {
+              if (img.complete) img.classList.add("loaded");
+              else
+                img.addEventListener(
+                  "load",
+                  () => img.classList.add("loaded"),
+                  { once: true },
+                );
+            });
+            const a = (Math.random() * 7 - 3.5).toFixed(1);
+            c.style.setProperty("--rot", `${a}deg`);
+            c.style.transform = `rotate(${a}deg)`;
+          });
+        }
+        setupCards(document.querySelectorAll(".flip-card"));
+
+        hideAll();
+        document.getElementById("wedding-left").style.display = "flex";
+        document.getElementById("wedding-right").style.display = "flex";
+        updatePagination();
+
+        /* ─── TOOLBAR ─── */
+        const writeBtn = document.getElementById("write-btn"),
+          eraseBtn = document.getElementById("erase-btn");
+        let wM = false,
+          eM = false;
+        function toolUI() {
+          writeBtn.classList.toggle("active", wM);
+          eraseBtn.classList.toggle("active", eM);
+          document.body.classList.toggle("write-mode", wM);
+          document.body.classList.toggle("erase-mode", eM);
+          writeBtn.querySelector("span,text"); // just toggle class
+          writeBtn.childNodes.forEach((n) => {
+            if (n.nodeType === 3) {
+              n.textContent = wM ? " Bitir" : " Yazı Ekle";
+            }
+          });
+          eraseBtn.childNodes.forEach((n) => {
+            if (n.nodeType === 3) {
+              n.textContent = eM ? " Bitir" : " Silgi";
+            }
+          });
+        }
+        writeBtn.addEventListener("click", () => {
+          wM = !wM;
+          if (wM) eM = false;
+          toolUI();
+        });
+        eraseBtn.addEventListener("click", () => {
+          eM = !eM;
+          if (eM) wM = false;
+          toolUI();
+        });
+        document.addEventListener("click", (e) => {
+          if (eM && e.target.classList.contains("doodle")) e.target.remove();
+        });
+
+        document.querySelectorAll(".page").forEach((page) => {
+          page.addEventListener("click", (e) => {
+            if (!wM) return;
+            if (
+              e.target.closest(".flip-card") ||
+              e.target.closest(".toolbar") ||
+              e.target.closest(".bookmark") ||
+              e.target.classList.contains("doodle") ||
+              e.target.classList.contains("doodle-input")
+            )
+              return;
+            if (document.querySelector(".doodle-input")) return;
+            const sec = Array.from(page.querySelectorAll(".view-section")).find(
+              (s) => getComputedStyle(s).display !== "none",
+            );
+            if (!sec) return;
+            const sub = Array.from(sec.querySelectorAll(".sub-page")).find(
+              (s) => getComputedStyle(s).display !== "none",
+            );
+            if (!sub) return;
+            const rect = sub.getBoundingClientRect();
+            const inp = document.createElement("input");
+            inp.type = "text";
+            inp.className = "doodle-input";
+            inp.style.left = e.clientX - rect.left + "px";
+            inp.style.top = e.clientY - rect.top + "px";
+            inp.placeholder = "Yaz → Enter";
+            sub.appendChild(inp);
+            inp.focus();
+            let saved = false;
+            const save = () => {
+              if (saved) return;
+              saved = true;
+              if (inp.value.trim()) {
+                const sp = document.createElement("span");
+                sp.className = "doodle";
+                sp.textContent = inp.value;
+                sp.style.left = inp.style.left;
+                sp.style.top = inp.style.top;
+                sp.style.transform = `rotate(${Math.floor(Math.random() * 12) - 6}deg)`;
+                let layer = sub.querySelector(".doodle-layer");
+                if (!layer) {
+                  layer = document.createElement("div");
+                  layer.className = "doodle-layer";
+                  sub.appendChild(layer);
+                }
+                layer.appendChild(sp);
+              }
+              inp.remove();
+            };
+            inp.addEventListener("keydown", (ev) => {
+              if (ev.key === "Enter") save();
+            });
+            inp.addEventListener("blur", save);
+          });
+        });
+
+        /* ─── UPLOAD ─── */
+        const singleUp = document.getElementById("single-up"),
+          bulkUp = document.getElementById("bulk-up");
+        let curImg = null;
+        function setupRep() {
+          document.querySelectorAll(".rep-btn").forEach((btn) => {
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              curImg = btn.previousElementSibling;
+              singleUp.click();
+            };
+          });
+        }
+        setupRep();
+        singleUp.addEventListener("change", (e) => {
+          const f = e.target.files[0];
+          if (f && curImg) {
+            curImg.src = URL.createObjectURL(f);
+            curImg.classList.remove("loaded");
+            curImg.addEventListener(
+              "load",
+              () => curImg.classList.add("loaded"),
+              { once: true },
+            );
+          }
+          e.target.value = "";
+        });
+
+        /* Palette for year bookmarks — muted modern tones */
+        const bmPal = [
+          "#1e4a6e",
+          "#2e6e3a",
+          "#6e3a1e",
+          "#4a1e6e",
+          "#1e6e5a",
+          "#6e521e",
+          "#4a2e6e",
+          "#1e4a3a",
+        ];
+
+        bulkUp.addEventListener("change", (e) => {
+          const files = Array.from(e.target.files);
+          if (!files.length) return;
+          const byY = {};
+          files.forEach((f) => {
+            const y = new Date(f.lastModified).getFullYear() + "";
+            if (!byY[y]) byY[y] = [];
+            byY[y].push(f);
+          });
+          let lastT = null,
+            lastBm = null;
+          Object.keys(byY)
+            .sort()
+            .forEach((yr, idx) => {
+              const yf = byY[yr],
+                yt = "year-" + yr;
+              let bm = document.querySelector(`.bookmark[data-type="${yt}"]`);
+              if (!bm) {
+                bm = document.createElement("div");
+                bm.className = "bookmark";
+                bm.style.setProperty("--bm-c", bmPal[idx % bmPal.length]);
+                bm.dataset.type = yt;
+                bm.innerHTML = `<span>${yr}</span>`;
+                const ct = document.getElementById("bm-container"),
+                  wb = document.querySelector(`.bookmark[data-type="wedding"]`);
+                ct.insertBefore(bm, wb);
+                setupBM();
+              }
+              let ls = document.getElementById(yt + "-left"),
+                rs = document.getElementById(yt + "-right");
+              if (!ls) {
+                ls = document.createElement("div");
+                ls.id = yt + "-left";
+                ls.className = "view-section hidden";
+                document.getElementById("lp-el").appendChild(ls);
+                rs = document.createElement("div");
+                rs.id = yt + "-right";
+                rs.className = "view-section hidden";
+                document.getElementById("rp-el").appendChild(rs);
+              }
+              const ch = 4;
+              let sp = ls.querySelectorAll(".sub-page").length + 1;
+              for (let i = 0; i < yf.length; i += ch * 2) {
+                const lp = yf.slice(i, i + ch),
+                  rp = yf.slice(i + ch, i + ch * 2);
+                if (lp.length) {
+                  const d = document.createElement("div");
+                  d.className = "sub-page";
+                  d.setAttribute("data-page", sp);
+                  if (sp !== 1) d.style.display = "none";
+                  d.appendChild(mkGrid(lp));
+                  ls.appendChild(d);
+                }
+                const d = document.createElement("div");
+                d.className = "sub-page";
+                d.setAttribute("data-page", sp);
+                if (sp !== 1) d.style.display = "none";
+                if (rp.length) d.appendChild(mkGrid(rp));
+                rs.appendChild(d);
+                sp++;
+              }
+              lastT = yt;
+              lastBm = bm;
+            });
+          setupCards(document.querySelectorAll(".flip-card"));
+          setupRep();
+          if (lastT && lastBm) {
+            AT = lastT;
+            document
+              .querySelectorAll(".bookmark")
+              .forEach((b) => b.classList.remove("active"));
+            lastBm.classList.add("active");
+            hideAll();
+            document.getElementById(lastT + "-left").style.display = "flex";
+            document.getElementById(lastT + "-right").style.display = "flex";
+            CP = 1;
+            updatePagination();
+          }
+          e.target.value = "";
+        });
+
+        function mkGrid(arr) {
+          const g = document.createElement("div");
+          g.className = `photo-grid collage-${Math.min(arr.length, 4)}`;
+          arr.slice(0, 4).forEach((f) => {
+            const d = new Date(f.lastModified),
+              lb = d.toLocaleDateString("tr-TR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              });
+            const c = document.createElement("div");
+            c.className = "flip-card";
+            c.innerHTML = `<div class="flip-card-inner">
+      <div class="flip-card-front">
+        <img src="${URL.createObjectURL(f)}" loading="eager" decoding="async">
+        <button class="rep-btn">📷</button>
+      </div>
+      <div class="flip-card-back">
+        <span class="date" contenteditable="true" spellcheck="false">${lb}</span>
+        <p class="note" contenteditable="true" spellcheck="false">Yeni anı…</p>
+      </div>
+    </div>`;
+            g.appendChild(c);
+          });
+          return g;
+        }
+      });
+    </script>
+  </body>
+</html>
