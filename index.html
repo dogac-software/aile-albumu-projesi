@@ -1,0 +1,1558 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Aile Albümüm</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ─────────────────────────────────────────
+   RESET & TOKENS
+───────────────────────────────────────── */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0c0a08;
+        --surface: #141210;
+        --card: #1c1916;
+        --border: rgba(200, 170, 110, 0.12);
+        --border2: rgba(200, 170, 110, 0.22);
+        --gold: #c8a96e;
+        --gold2: #e8c87a;
+        --goldl: rgba(200, 169, 110, 0.08);
+        --text: #f0ead8;
+        --muted: rgba(240, 234, 216, 0.45);
+        --muted2: rgba(240, 234, 216, 0.28);
+        --paper: #f5edda;
+        --r: 8px;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ─── GRAIN OVERLAY ─── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.6;
+      }
+
+      /* ─── AMBIENT GLOW ─── */
+      .glow-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 40% at 25% 60%,
+            rgba(180, 130, 60, 0.06) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 50% 35% at 75% 40%,
+            rgba(140, 100, 50, 0.04) 0%,
+            transparent 70%
+          );
+      }
+
+      /* ─────────────────────────────────────────
+   HEADER
+───────────────────────────────────────── */
+      header {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 56px 24px 0;
+        text-align: center;
+      }
+      .logo-eyebrow {
+        font-family: "DM Sans", sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0.7;
+        margin-bottom: 16px;
+      }
+      header h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(42px, 7vw, 88px);
+        font-weight: 300;
+        line-height: 0.95;
+        letter-spacing: -1px;
+        color: var(--text);
+      }
+      header h1 em {
+        font-style: italic;
+        font-weight: 300;
+        color: var(--gold);
+      }
+      .header-sub {
+        margin-top: 18px;
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--muted);
+        letter-spacing: 0.3px;
+        max-width: 380px;
+        line-height: 1.7;
+      }
+      .header-divider {
+        width: 1px;
+        height: 40px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          var(--gold2),
+          transparent
+        );
+        margin: 32px auto 0;
+        opacity: 0.4;
+      }
+
+      /* ─────────────────────────────────────────
+   MAIN CARDS SECTION
+───────────────────────────────────────── */
+      .cards-section {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: stretch;
+        padding: 40px 24px 60px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      /* ─── CARD BASE ─── */
+      .action-card {
+        flex: 1;
+        min-width: 0;
+        max-width: 400px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+        transition:
+          transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+          border-color 0.3s,
+          box-shadow 0.3s;
+        background: var(--card);
+      }
+      .action-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--border2);
+        box-shadow:
+          0 28px 60px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(200, 169, 110, 0.1);
+      }
+      .action-card:active {
+        transform: translateY(-2px);
+      }
+
+      /* Card inner glow on hover */
+      .action-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(200, 169, 110, 0.06) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .action-card:hover::before {
+        opacity: 1;
+      }
+
+      /* ─── CARD VISUAL AREA ─── */
+      .card-visual {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* CREATE card visual — open book illustration */
+      .create-visual {
+        background: linear-gradient(160deg, #1e1812 0%, #16120e 100%);
+      }
+      .book-illustration {
+        position: relative;
+        width: 160px;
+        height: 110px;
+        animation: bookFloat 4s ease-in-out infinite;
+      }
+      @keyframes bookFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+
+      .book-ill-left,
+      .book-ill-right {
+        position: absolute;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .book-ill-left {
+        left: 0;
+        background: linear-gradient(108deg, #f5edda, #e8d8b8);
+        transform-origin: right center;
+        transform: perspective(400px) rotateY(-8deg);
+        box-shadow:
+          -4px 4px 20px rgba(0, 0, 0, 0.6),
+          inset -6px 0 12px rgba(0, 0, 0, 0.1);
+      }
+      .book-ill-right {
+        right: 0;
+        background: linear-gradient(72deg, #e8d8b8, #f5edda);
+        transform-origin: left center;
+        transform: perspective(400px) rotateY(8deg);
+        box-shadow:
+          4px 4px 20px rgba(0, 0, 0, 0.6),
+          inset 6px 0 12px rgba(0, 0, 0, 0.1);
+      }
+      .book-ill-spine {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 8px;
+        height: 100%;
+        background: linear-gradient(to right, #2a1a08, #3e2810, #2a1a08);
+        z-index: 2;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      /* Photo placeholders on pages */
+      .book-photo {
+        position: absolute;
+        background: rgba(140, 100, 50, 0.2);
+        border: 1px solid rgba(140, 100, 50, 0.25);
+        border-radius: 1px;
+      }
+      .plus-icon {
+        position: absolute;
+        width: 52px;
+        height: 52px;
+        background: rgba(200, 169, 110, 0.12);
+        border: 1.5px solid rgba(200, 169, 110, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        transition: all 0.3s;
+        z-index: 5;
+      }
+      .plus-icon svg {
+        width: 22px;
+        height: 22px;
+        color: var(--gold2);
+      }
+      .action-card:hover .plus-icon {
+        background: rgba(200, 169, 110, 0.22);
+        border-color: var(--gold2);
+        transform: scale(1.1);
+      }
+
+      /* ORDER card visual — stacked album covers */
+      .order-visual {
+        background: linear-gradient(160deg, #12100e 0%, #1a1510 100%);
+      }
+      .album-stack {
+        position: relative;
+        width: 140px;
+        height: 100px;
+      }
+      .album-cover {
+        position: absolute;
+        border-radius: 4px 8px 8px 4px;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .action-card:hover .ac-1 {
+        transform: translate(-22px, -8px) rotate(-6deg);
+      }
+      .action-card:hover .ac-2 {
+        transform: translate(0, -4px) rotate(0deg);
+      }
+      .action-card:hover .ac-3 {
+        transform: translate(22px, -8px) rotate(6deg);
+      }
+      .ac-1 {
+        width: 88px;
+        height: 114px;
+        left: 26px;
+        top: -7px;
+        background: linear-gradient(
+          135deg,
+          #3d2208 0%,
+          #5a3010 50%,
+          #2e1a08 100%
+        );
+        box-shadow: -4px 6px 20px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(200, 169, 110, 0.2);
+        transform: rotate(-5deg);
+        z-index: 1;
+      }
+      .ac-2 {
+        width: 90px;
+        height: 116px;
+        left: 25px;
+        top: -8px;
+        background: linear-gradient(
+          135deg,
+          #1e3a20 0%,
+          #2e5a30 50%,
+          #162a18 100%
+        );
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(100, 180, 110, 0.18);
+        z-index: 2;
+      }
+      .ac-3 {
+        width: 88px;
+        height: 114px;
+        left: 26px;
+        top: -7px;
+        background: linear-gradient(
+          135deg,
+          #1a2a4a 0%,
+          #2a3e6e 50%,
+          #121e38 100%
+        );
+        box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(100, 130, 200, 0.15);
+        transform: rotate(5deg);
+        z-index: 1;
+      }
+      /* Gold lines on album spines */
+      .ac-1::before,
+      .ac-2::before,
+      .ac-3::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 5px;
+        width: 2px;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(200, 169, 110, 0.4),
+          transparent
+        );
+        border-radius: 1px;
+      }
+      .ac-2::after {
+        content: "✦";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: rgba(200, 169, 110, 0.3);
+        font-size: 18px;
+      }
+      .cart-icon {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        width: 40px;
+        height: 40px;
+        background: rgba(200, 169, 110, 0.1);
+        border: 1px solid rgba(200, 169, 110, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        z-index: 5;
+      }
+      .cart-icon svg {
+        width: 18px;
+        height: 18px;
+        color: var(--gold);
+      }
+      .action-card:hover .cart-icon {
+        background: rgba(200, 169, 110, 0.2);
+        border-color: var(--gold2);
+      }
+
+      /* ─── CARD BODY ─── */
+      .card-body {
+        padding: 22px 24px 26px;
+        border-top: 1px solid var(--border);
+        position: relative;
+        z-index: 2;
+      }
+      .card-tag {
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0.7;
+        margin-bottom: 8px;
+      }
+      .card-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(22px, 3vw, 28px);
+        font-weight: 400;
+        line-height: 1.15;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      .card-title em {
+        font-style: italic;
+        color: var(--gold2);
+      }
+      .card-desc {
+        font-size: 13px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 20px;
+      }
+      .card-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        color: var(--gold);
+        transition: gap 0.2s;
+      }
+      .card-cta svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.2s;
+      }
+      .action-card:hover .card-cta {
+        gap: 12px;
+      }
+      .action-card:hover .card-cta svg {
+        transform: translateX(3px);
+      }
+
+      /* ─────────────────────────────────────────
+   FEATURES ROW
+───────────────────────────────────────── */
+      .features {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        gap: 0;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px 80px;
+        border-top: 1px solid var(--border);
+      }
+      .feat {
+        flex: 1;
+        padding: 28px 20px;
+        border-right: 1px solid var(--border);
+        text-align: center;
+      }
+      .feat:last-child {
+        border-right: none;
+      }
+      .feat-icon {
+        font-size: 20px;
+        margin-bottom: 12px;
+        display: block;
+        filter: grayscale(0.3);
+      }
+      .feat-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 16px;
+        font-weight: 400;
+        font-style: italic;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .feat-desc {
+        font-size: 11px;
+        font-weight: 300;
+        color: var(--muted);
+        line-height: 1.6;
+        letter-spacing: 0.2px;
+      }
+
+      /* ─────────────────────────────────────────
+   ORDER MODAL
+───────────────────────────────────────── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(8, 6, 4, 0.85);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal {
+        background: var(--surface);
+        border: 1px solid var(--border2);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 780px;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: translateY(20px) scale(0.97);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+      }
+      .modal-overlay.open .modal {
+        transform: translateY(0) scale(1);
+      }
+
+      .modal-header {
+        padding: 28px 32px 22px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background: var(--surface);
+        z-index: 5;
+        border-radius: 16px 16px 0 0;
+      }
+      .modal-title-group {
+      }
+      .modal-eyebrow {
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0.7;
+        margin-bottom: 6px;
+      }
+      .modal-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(24px, 4vw, 34px);
+        font-weight: 300;
+        color: var(--text);
+        line-height: 1.1;
+      }
+      .modal-title em {
+        font-style: italic;
+        color: var(--gold2);
+      }
+      .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 18px;
+        transition: all 0.18s;
+        flex-shrink: 0;
+        margin-top: 4px;
+      }
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+
+      /* ─── PLAN CARDS ─── */
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 28px 32px;
+      }
+      @media (max-width: 600px) {
+        .plans-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .plan-card {
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.22s;
+        position: relative;
+      }
+      .plan-card:hover {
+        border-color: var(--border2);
+        transform: translateY(-3px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      }
+      .plan-card.selected {
+        border-color: var(--gold);
+        box-shadow:
+          0 0 0 1px rgba(200, 169, 110, 0.3),
+          0 16px 40px rgba(0, 0, 0, 0.4);
+      }
+      .plan-card.featured {
+        border-color: rgba(200, 169, 110, 0.35);
+      }
+      .plan-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        background: var(--gold);
+        color: #0c0a08;
+        padding: 3px 8px;
+        border-radius: 3px;
+      }
+
+      /* Album cover art per plan */
+      .plan-cover {
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .pc-classic {
+        background: linear-gradient(
+          135deg,
+          #2a1608 0%,
+          #3e2410 50%,
+          #1e1008 100%
+        );
+      }
+      .pc-premium {
+        background: linear-gradient(
+          135deg,
+          #0e1e0a 0%,
+          #1a3214 50%,
+          #0a1608 100%
+        );
+      }
+      .pc-luxury {
+        background: linear-gradient(
+          135deg,
+          #0a0e1e 0%,
+          #14183a 50%,
+          #060a14 100%
+        );
+      }
+
+      .plan-cover-book {
+        width: 68px;
+        height: 90px;
+        border-radius: 2px 6px 6px 2px;
+        position: relative;
+        box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.7);
+      }
+      .plan-cover-book::before {
+        /* spine */
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        border-radius: 2px 0 0 2px;
+      }
+      .plan-cover-book::after {
+        /* gold border */
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border: 1px solid rgba(200, 169, 110, 0.3);
+        border-radius: 1px;
+      }
+      .pc-classic .plan-cover-book {
+        background: linear-gradient(160deg, #5a3010, #3a1e08);
+      }
+      .pc-classic .plan-cover-book::before {
+        background: linear-gradient(to right, #1a0a04, #2e1508);
+      }
+      .pc-premium .plan-cover-book {
+        background: linear-gradient(160deg, #1e4a20, #0e2e10);
+      }
+      .pc-premium .plan-cover-book::before {
+        background: linear-gradient(to right, #081408, #0e2010);
+      }
+      .pc-luxury .plan-cover-book {
+        background: linear-gradient(160deg, #1a2a5a, #0a1838);
+      }
+      .pc-luxury .plan-cover-book::before {
+        background: linear-gradient(to right, #04080e, #0a1030);
+      }
+      /* Page edges visible */
+      .plan-cover-book .page-edges {
+        position: absolute;
+        right: -3px;
+        top: 4px;
+        bottom: 4px;
+        width: 4px;
+        background: repeating-linear-gradient(
+          to bottom,
+          #f5edda 0px,
+          #f5edda 1px,
+          #e8d8b8 1px,
+          #e8d8b8 2px
+        );
+        border-radius: 0 1px 1px 0;
+      }
+      /* Cover title */
+      .plan-cover-label {
+        position: absolute;
+        bottom: 18px;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 7px;
+        font-style: italic;
+        color: rgba(200, 169, 110, 0.6);
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+      }
+
+      /* Floating pages count badge */
+      .plan-cover-pages {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(200, 169, 110, 0.12);
+        border: 1px solid rgba(200, 169, 110, 0.25);
+        border-radius: 4px;
+        padding: 3px 8px;
+        font-size: 9px;
+        font-weight: 500;
+        color: var(--gold);
+        letter-spacing: 0.5px;
+      }
+
+      .plan-body {
+        padding: 18px 20px 22px;
+      }
+      .plan-name {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      .plan-tagline {
+        font-size: 11px;
+        font-weight: 300;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+      .plan-features {
+        list-style: none;
+        margin-bottom: 18px;
+      }
+      .plan-features li {
+        font-size: 11px;
+        font-weight: 300;
+        color: var(--muted);
+        padding: 4px 0;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .plan-features li:last-child {
+        border-bottom: none;
+      }
+      .plan-features li::before {
+        content: "✦";
+        color: var(--gold);
+        font-size: 7px;
+        flex-shrink: 0;
+      }
+      .plan-price {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        margin-bottom: 16px;
+      }
+      .plan-price .amount {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 32px;
+        font-weight: 300;
+        color: var(--text);
+      }
+      .plan-price .currency {
+        font-size: 14px;
+        color: var(--muted);
+        margin-right: 2px;
+      }
+      .plan-price .period {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .plan-price .old-price {
+        font-size: 13px;
+        color: var(--muted);
+        text-decoration: line-through;
+        margin-left: 6px;
+      }
+
+      .select-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.4px;
+        cursor: pointer;
+        transition: all 0.18s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .select-btn.outline {
+        background: transparent;
+        border: 1px solid var(--border2);
+        color: var(--muted);
+      }
+      .select-btn.outline:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+      .select-btn.gold-fill {
+        background: linear-gradient(135deg, var(--gold), var(--gold2));
+        border: none;
+        color: #0c0a08;
+        font-weight: 600;
+      }
+      .select-btn.gold-fill:hover {
+        filter: brightness(1.1);
+      }
+      .plan-card.selected .select-btn.outline {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: rgba(200, 169, 110, 0.08);
+      }
+
+      /* ─── COMPARISON TABLE ─── */
+      .compare-section {
+        padding: 0 32px 28px;
+        border-top: 1px solid var(--border);
+        margin-top: 4px;
+      }
+      .compare-toggle {
+        padding: 20px 0 16px;
+        font-size: 12px;
+        color: var(--muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        user-select: none;
+      }
+      .compare-toggle svg {
+        width: 12px;
+        height: 12px;
+        transition: transform 0.2s;
+      }
+      .compare-toggle.open svg {
+        transform: rotate(180deg);
+      }
+      .compare-body {
+        display: none;
+      }
+      .compare-body.open {
+        display: block;
+      }
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+      }
+      .compare-table th {
+        font-weight: 500;
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .compare-table th:not(:first-child) {
+        text-align: center;
+      }
+      .compare-table td {
+        padding: 9px 12px;
+        color: var(--muted);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .compare-table td:not(:first-child) {
+        text-align: center;
+      }
+      .compare-table td.chk {
+        color: var(--gold);
+      }
+      .compare-table td.x {
+        color: rgba(255, 255, 255, 0.18);
+      }
+      .compare-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* ─── MODAL FOOTER ─── */
+      .modal-footer {
+        padding: 20px 32px 28px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .footer-note {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .footer-note svg {
+        width: 13px;
+        height: 13px;
+        color: var(--gold);
+        flex-shrink: 0;
+      }
+      .checkout-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+        color: #0c0a08;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        padding: 12px 28px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .checkout-btn:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+      .checkout-btn svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      /* ─────────────────────────────────────────
+   SUCCESS TOAST
+───────────────────────────────────────── */
+      .toast {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: linear-gradient(135deg, #1a2a1a, #0e1a0e);
+        border: 1px solid rgba(100, 200, 110, 0.25);
+        border-radius: 10px;
+        padding: 14px 22px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: rgba(150, 230, 160, 0.9);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        z-index: 3000;
+        transition:
+          transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+          opacity 0.3s;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+      .toast svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      /* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+      @media (max-width: 640px) {
+        .cards-section {
+          flex-direction: column;
+          align-items: center;
+          padding: 32px 16px 48px;
+        }
+        .action-card {
+          max-width: 100%;
+        }
+        .features {
+          flex-wrap: wrap;
+        }
+        .feat {
+          min-width: calc(50% - 0px);
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .plans-grid {
+          padding: 20px;
+        }
+        .modal-header,
+        .modal-footer {
+          padding: 20px;
+        }
+        .compare-section {
+          padding: 0 20px 20px;
+        }
+      }
+
+      /* ─────────────────────────────────────────
+   SCROLL ANIMATIONS
+───────────────────────────────────────── */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .anim-1 {
+        animation: fadeUp 0.7s 0.1s both cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .anim-2 {
+        animation: fadeUp 0.7s 0.25s both cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .anim-3 {
+        animation: fadeUp 0.7s 0.35s both cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .anim-4 {
+        animation: fadeUp 0.7s 0.48s both cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .anim-5 {
+        animation: fadeUp 0.7s 0.58s both cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow-bg"></div>
+
+    <!-- ═══════════════════════════════════════
+     HEADER
+═══════════════════════════════════════ -->
+    <header>
+      <p class="logo-eyebrow anim-1">Dijital & Baskı Albümü</p>
+      <h1 class="anim-2">Aile<br /><em>Albümüm</em></h1>
+      <p class="header-sub anim-3">
+        Anılarınızı düzenleyin, tasarlayın ve tek tıkla profesyonel baskıya
+        gönderin.
+      </p>
+      <div class="header-divider anim-3"></div>
+    </header>
+
+    <!-- ═══════════════════════════════════════
+     MAIN CARDS
+═══════════════════════════════════════ -->
+    <section class="cards-section">
+      <!-- CREATE CARD -->
+      <a
+        href="album.html"
+        class="action-card anim-4"
+        style="text-decoration: none"
+      >
+        <div class="card-visual create-visual">
+          <div class="book-illustration">
+            <div class="book-ill-left">
+              <div
+                class="book-photo"
+                style="width: 48px; height: 32px; top: 14px; left: 10px"
+              ></div>
+              <div
+                class="book-photo"
+                style="width: 28px; height: 20px; bottom: 14px; left: 10px"
+              ></div>
+              <div
+                class="book-photo"
+                style="width: 28px; height: 20px; bottom: 14px; right: 10px"
+              ></div>
+            </div>
+            <div class="book-ill-right">
+              <div
+                class="book-photo"
+                style="width: 28px; height: 38px; top: 12px; left: 8px"
+              ></div>
+              <div
+                class="book-photo"
+                style="width: 28px; height: 18px; bottom: 12px; right: 8px"
+              ></div>
+            </div>
+            <div class="book-ill-spine"></div>
+          </div>
+          <div class="plus-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-tag">Albüm Oluştur</p>
+          <h2 class="card-title">Yeni Albüm<br /><em>Başlat</em></h2>
+          <p class="card-desc">
+            Fotoğraflarınızı yükleyin, düzenleyin, notlar ekleyin. Dilediğiniz
+            an baskıya hazır.
+          </p>
+          <span class="card-cta">
+            Albümü Aç
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M3 8h10M9 4l4 4-4 4" />
+            </svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- ORDER CARD -->
+      <div class="action-card anim-5" id="open-order">
+        <div class="card-visual order-visual">
+          <div class="album-stack">
+            <div class="album-cover ac-1"></div>
+            <div class="album-cover ac-2"></div>
+            <div class="album-cover ac-3"></div>
+          </div>
+          <div class="cart-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-tag">Profesyonel Baskı</p>
+          <h2 class="card-title">Albümünü<br /><em>Sipariş Et</em></h2>
+          <p class="card-desc">
+            Tasarladığınız albümü gerçek bir kitaba dönüştürün. Premium cilt,
+            özel kağıt seçenekleri.
+          </p>
+          <span class="card-cta">
+            Paketleri İncele
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M3 8h10M9 4l4 4-4 4" />
+            </svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     FEATURES
+═══════════════════════════════════════ -->
+    <section class="features">
+      <div class="feat">
+        <span class="feat-icon">✒</span>
+        <div class="feat-title">El Yazısı Notlar</div>
+        <p class="feat-desc">
+          Fotoğrafların arkasına istediğiniz anı yazın, tarihleri düzenleyin.
+        </p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">📐</span>
+        <div class="feat-title">Otomatik Düzen</div>
+        <p class="feat-desc">
+          Yüklenen fotoğraflar yıla göre otomatik gruplandırılır.
+        </p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">📦</span>
+        <div class="feat-title">Kapıya Teslimat</div>
+        <p class="feat-desc">
+          Sipariş verdikten 5–7 iş günü içinde elinizde olur.
+        </p>
+      </div>
+      <div class="feat">
+        <span class="feat-icon">🔒</span>
+        <div class="feat-title">Güvenli & Özel</div>
+        <p class="feat-desc">Tüm fotoğraflarınız şifreli, sadece size ait.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+     ORDER MODAL
+═══════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <!-- Header -->
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <p class="modal-eyebrow">Baskı Paketleri</p>
+            <h2 class="modal-title">Albümünü <em>Hayata Geçir</em></h2>
+          </div>
+          <button class="modal-close" id="modal-close" aria-label="Kapat">
+            ✕
+          </button>
+        </div>
+
+        <!-- Plans -->
+        <div class="plans-grid">
+          <!-- CLASSIC -->
+          <div class="plan-card" data-plan="classic" onclick="selectPlan(this)">
+            <div class="plan-cover pc-classic">
+              <div class="plan-cover-book">
+                <div class="page-edges"></div>
+              </div>
+              <div class="plan-cover-label">Classic</div>
+              <div class="plan-cover-pages">20 Sayfa</div>
+            </div>
+            <div class="plan-body">
+              <div class="plan-name">Klasik</div>
+              <div class="plan-tagline">Günlük anılar için ideal</div>
+              <ul class="plan-features">
+                <li>20 sayfa, A4 boyut</li>
+                <li>Mat kuşe kağıt, 170gr</li>
+                <li>Sert kapak cilt</li>
+                <li>7–10 iş günü teslimat</li>
+              </ul>
+              <div class="plan-price">
+                <span class="currency">₺</span>
+                <span class="amount">349</span>
+                <span class="old-price">₺420</span>
+              </div>
+              <button class="select-btn outline">Seç</button>
+            </div>
+          </div>
+
+          <!-- PREMIUM (featured) -->
+          <div
+            class="plan-card featured"
+            data-plan="premium"
+            onclick="selectPlan(this)"
+          >
+            <div class="plan-badge">En Popüler</div>
+            <div class="plan-cover pc-premium">
+              <div class="plan-cover-book">
+                <div class="page-edges"></div>
+              </div>
+              <div class="plan-cover-label">Premium</div>
+              <div class="plan-cover-pages">40 Sayfa</div>
+            </div>
+            <div class="plan-body">
+              <div class="plan-name">Premium</div>
+              <div class="plan-tagline">Özel günler için mükemmel</div>
+              <ul class="plan-features">
+                <li>40 sayfa, A4 boyut</li>
+                <li>Parlak fotoğraf kağıdı, 220gr</li>
+                <li>Deri dokulu sert kapak</li>
+                <li>Altın varak isim baskısı</li>
+                <li>5–7 iş günü teslimat</li>
+              </ul>
+              <div class="plan-price">
+                <span class="currency">₺</span>
+                <span class="amount">649</span>
+                <span class="old-price">₺790</span>
+              </div>
+              <button class="select-btn gold-fill">Seç →</button>
+            </div>
+          </div>
+
+          <!-- LUXURY -->
+          <div class="plan-card" data-plan="luxury" onclick="selectPlan(this)">
+            <div class="plan-cover pc-luxury">
+              <div class="plan-cover-book">
+                <div class="page-edges"></div>
+              </div>
+              <div class="plan-cover-label">Luxury</div>
+              <div class="plan-cover-pages">60 Sayfa</div>
+            </div>
+            <div class="plan-body">
+              <div class="plan-name">Lüks</div>
+              <div class="plan-tagline">Nesilden nesile kalacak</div>
+              <ul class="plan-features">
+                <li>60 sayfa, A3 boyut</li>
+                <li>Fine Art kağıt, 300gr</li>
+                <li>Gerçek deri kapak + kutu</li>
+                <li>Altın varak + el ciltleme</li>
+                <li>Kişisel baskı danışmanı</li>
+                <li>3–5 iş günü öncelikli</li>
+              </ul>
+              <div class="plan-price">
+                <span class="currency">₺</span>
+                <span class="amount">1.290</span>
+              </div>
+              <button class="select-btn outline">Seç</button>
+            </div>
+          </div>
+        </div>
+        <!-- /plans-grid -->
+
+        <!-- Compare toggle -->
+        <div class="compare-section">
+          <div
+            class="compare-toggle"
+            id="compare-toggle"
+            onclick="toggleCompare()"
+          >
+            <svg
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M2 4l4 4 4-4" />
+            </svg>
+            Detaylı karşılaştırma
+          </div>
+          <div class="compare-body" id="compare-body">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Özellik</th>
+                  <th>Klasik</th>
+                  <th>Premium</th>
+                  <th>Lüks</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sayfa sayısı</td>
+                  <td>20</td>
+                  <td>40</td>
+                  <td>60</td>
+                </tr>
+                <tr>
+                  <td>Boyut</td>
+                  <td>A4</td>
+                  <td>A4</td>
+                  <td>A3</td>
+                </tr>
+                <tr>
+                  <td>Kağıt gramajı</td>
+                  <td>170gr</td>
+                  <td>220gr</td>
+                  <td>300gr</td>
+                </tr>
+                <tr>
+                  <td>Altın varak</td>
+                  <td class="x">✗</td>
+                  <td class="chk">✦</td>
+                  <td class="chk">✦</td>
+                </tr>
+                <tr>
+                  <td>Gerçek deri</td>
+                  <td class="x">✗</td>
+                  <td class="x">✗</td>
+                  <td class="chk">✦</td>
+                </tr>
+                <tr>
+                  <td>Hediye kutusu</td>
+                  <td class="x">✗</td>
+                  <td class="x">✗</td>
+                  <td class="chk">✦</td>
+                </tr>
+                <tr>
+                  <td>El ciltleme</td>
+                  <td class="x">✗</td>
+                  <td class="x">✗</td>
+                  <td class="chk">✦</td>
+                </tr>
+                <tr>
+                  <td>Öncelikli teslimat</td>
+                  <td class="x">✗</td>
+                  <td class="x">✗</td>
+                  <td class="chk">✦</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <div class="footer-note">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="3" y="7" width="10" height="8" rx="1" />
+              <path d="M5 7V5a3 3 0 016 0v2" />
+            </svg>
+            Güvenli ödeme · %100 memnuniyet garantisi
+          </div>
+          <button class="checkout-btn" onclick="checkout()">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+                transform="scale(.65) translate(2,2)"
+              />
+            </svg>
+            Sipariş Ver
+          </button>
+        </div>
+      </div>
+      <!-- /modal -->
+    </div>
+    <!-- /modal-overlay -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <svg
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M13 4L6 11l-3-3" />
+      </svg>
+      Siparişiniz alındı! En kısa sürede iletişime geçeceğiz.
+    </div>
+
+    <script>
+      /* ─── MODAL ─── */
+      const overlay = document.getElementById("modal-overlay");
+      document.getElementById("open-order").addEventListener("click", () => {
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+      });
+      document
+        .getElementById("modal-close")
+        .addEventListener("click", closeModal);
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+      function closeModal() {
+        overlay.classList.remove("open");
+        document.body.style.overflow = "";
+      }
+
+      /* ─── PLAN SELECT ─── */
+      let selectedPlan = "premium";
+      function selectPlan(card) {
+        document
+          .querySelectorAll(".plan-card")
+          .forEach((c) => c.classList.remove("selected"));
+        card.classList.add("selected");
+        selectedPlan = card.dataset.plan;
+        // Update all non-gold buttons
+        document
+          .querySelectorAll(".plan-card:not(.selected) .select-btn")
+          .forEach((b) => {
+            b.classList.remove("gold-fill");
+            b.classList.add("outline");
+            b.textContent = "Seç";
+          });
+        const selBtn = card.querySelector(".select-btn");
+        selBtn.classList.remove("outline");
+        selBtn.classList.add("gold-fill");
+        selBtn.textContent = "Seçildi ✦";
+      }
+      // Pre-select premium
+      selectPlan(document.querySelector('[data-plan="premium"]'));
+
+      /* ─── COMPARE TOGGLE ─── */
+      function toggleCompare() {
+        const toggle = document.getElementById("compare-toggle");
+        const body = document.getElementById("compare-body");
+        toggle.classList.toggle("open");
+        body.classList.toggle("open");
+      }
+
+      /* ─── CHECKOUT ─── */
+      function checkout() {
+        const names = { classic: "Klasik", premium: "Premium", luxury: "Lüks" };
+        closeModal();
+        const toast = document.getElementById("toast");
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 4000);
+      }
+    </script>
+  </body>
+</html>
